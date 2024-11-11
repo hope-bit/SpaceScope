@@ -4,7 +4,7 @@ import numpy as np
 from dash import Dash, dcc, html, Input, Output
 import panel as pn
 
-# Load dataset
+# Load dataset from local
 file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/train_dataset.hdf5'  # Adjust if needed
 with h5py.File(file_path, 'r') as hdf5_file:
     images = hdf5_file['images'][:]
