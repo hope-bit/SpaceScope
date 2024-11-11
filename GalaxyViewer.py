@@ -5,12 +5,17 @@ from dash import Dash, dcc, html, Input, Output
 import base64
 from io import BytesIO
 from PIL import Image
+from galaxy_mnist import GalaxyMNIST
 
 # Load dataset from local
 file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/train_dataset.hdf5'  # Update this path
 with h5py.File(file_path, 'r') as hdf5_file:
     images = hdf5_file['images'][:]
     labels = hdf5_file['labels'][:]
+    
+classArray = GalaxyMNIST.classes  # Class names for labels
+# Replace the numeric labels with the corresponding class names
+label_names = np.array([classArray[label] for label in labels])
 
 # Function to convert image array to base64 string
 def np_to_base64(img_array):
@@ -20,25 +25,36 @@ def np_to_base64(img_array):
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 # Static Visualizations
-def plot_label_histogram(labels):
+# Static Visualizations - Bar Plot for Label Distribution
+def plot_label_barplot(labels):
+    """
+    Plot a bar plot of label distribution.
+    """
+    # Count occurrences of each label
+    unique_labels, label_counts = np.unique(labels, return_counts=True)
+    
     plt.figure(figsize=(8, 6))
-    plt.hist(labels, bins=np.arange(labels.min(), labels.max() + 1), color='skyblue', edgecolor='black')
-    plt.title('Label Distribution')
-    plt.xlabel('Label')
-    plt.ylabel('Frequency')
+    plt.bar(unique_labels, label_counts, color='skyblue', edgecolor='black')
+    plt.title('Label Distribution (Bar Plot)')
+    plt.xlabel('Type of Galaxy')
+    plt.ylabel('Number of Images per type')
+    plt.xticks(unique_labels)  # Display label values on x-axis
     plt.grid(True)
+    
+    # Convert plot to base64 image
     img = BytesIO()
     plt.savefig(img, format='png')
     plt.close()
     img.seek(0)
     return base64.b64encode(img.read()).decode('utf-8')
 
+
 def plot_image_grid(images, labels, num_samples=10):
     plt.figure(figsize=(12, 8))
     for i in range(num_samples):
         plt.subplot(2, 5, i + 1)
         plt.imshow(images[i])
-        plt.title(f"Label: {labels[i]}")
+        plt.title(f"Label: {labels[i]}")  # Use label_names here
         plt.axis("off")
     plt.tight_layout()
     img = BytesIO()
@@ -55,11 +71,11 @@ app.layout = html.Div([
     
     # Static Visualizations Section
     html.Div([
-        html.H2("Label Distribution (Histogram)"),
-        html.Img(src=f"data:image/png;base64,{plot_label_histogram(labels)}", style={'width': '80%'}),
+        html.H2("Label Distribution (Bar Plot)"),
+        html.Img(src=f"data:image/png;base64,{plot_label_barplot(label_names)}", style={'width': '80%'}),
         
         html.H2("Sample Images Grid"),
-        html.Img(src=f"data:image/png;base64,{plot_image_grid(images, labels)}", style={'width': '80%'}),
+        html.Img(src=f"data:image/png;base64,{plot_image_grid(images, label_names)}", style={'width': '80%'}),
     ], style={'margin-bottom': '40px'}),  # Margin between static and interactive sections
     
     # Interactive Visualization Section
@@ -88,11 +104,11 @@ def update_images(selected_labels):
     for i, img in enumerate(filtered_images):
         image_elements.append(html.Div([
             html.Img(src=f'data:image/png;base64,{np_to_base64(img)}', style={'height': '100px'}),
-            html.P(f"Label: {labels[selected_indices][i]}")
+            html.P(f"Label: {label_names[selected_indices][i]}")  # Use label_names here
         ], style={'display': 'inline-block', 'margin': '10px'}))
 
     return html.Div(image_elements)
 
 # Run Dash app
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False, use_reloader=False)
