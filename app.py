@@ -10,8 +10,8 @@ import plotly.graph_objects as go
 
 # Load the GalaxyMNIST dataset
 # Assuming data is in the form of NumPy arrays, e.g., X_train.npy and y_train.npy
-X_train = np.load(r'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/X_train.npy')  # Images
-y_train = np.load(r'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/y_train.npy')  # Labels
+X_train = np.load(r'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist')  # Images
+y_train = np.load(r'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist')  # Labels
 
 # Check the shape of the loaded data
 print("Shape of X_train:", X_train.shape)  # Should be (num_samples, img_height, img_width)

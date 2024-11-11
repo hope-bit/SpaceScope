@@ -1,38 +1,13 @@
 import os
-import tkinter as tk
-from tkinter import filedialog, messagebox
-import random
-
-import panel as pn  # For creating interactive dashboards
-import pandas as pd  # For data manipulation and analysis
-import numpy as np  # For numerical operations
-import matplotlib
-matplotlib.use('Agg')  # Set the backend to 'Agg' to avoid GUI issues
+import panel as pn
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-import param  # For creating interactive widgets
-from tqdm import tqdm  # For progress bar
-from matplotlib.ticker import MaxNLocator  # For integer y-axis
-
-from galaxy_mnist import GalaxyMNIST  # Importing GalaxyMNIST dataset
-from PIL import Image
-import base64
+import param
+from tqdm import tqdm
+from galaxy_mnist import GalaxyMNIST
 from io import BytesIO
-
-# Step 1: Load the dataset
-dataset = GalaxyMNIST(
-    root='C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist',
-    download=True,
-    train=True
-)
-
-# Let's take the first image from the dataset (you can loop over more if needed)
-image_data = dataset[0][0]  # The first image in the dataset
-
-# Step 2: Convert the PIL image to a numpy array
-image_data_array = np.array(image_data)
-
-# Remove Bokeh-related imports and code
-# No more `Bokeh` plot here. We'll use matplotlib to visualize images.
+import base64
 
 class GalaxyDashboard(param.Parameterized):
     """
@@ -57,7 +32,7 @@ class GalaxyDashboard(param.Parameterized):
         self.data_table = pn.widgets.Tabulator(self.filtered_data, name='Image Data', sizing_mode='stretch_width', height=400)
         self.entry_counter = pn.pane.Markdown(f"<div style='font-size: 32px; font-weight: bold;'>Total Displayed Entries: {len(self.filtered_data)}</div>")
         self.preview_button = pn.widgets.Button(name='Preview Images', button_type='primary')
-        self.image_gallery = pn.Row()  # Pane to display the images in a row
+        self.image_gallery = pn.Row()
         self.class_plot_pane = pn.pane.Matplotlib()
         self.brightness_histogram_pane = pn.pane.Matplotlib()
         self.scatter_plot_pane = pn.pane.Matplotlib()
@@ -202,11 +177,6 @@ class GalaxyDashboard(param.Parameterized):
             ),
             self.data_table
         )
-    
-    def pil_image_to_base64(self, pil_img):
-        buffered = BytesIO()
-        pil_img.save(buffered, format="PNG")
-        return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 if __name__ == "__main__":
     pn.extension()
