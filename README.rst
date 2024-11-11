@@ -34,10 +34,32 @@ SpaceScope
 ==========
 
 
-    Add a short description here!
+Download the hdf5 dataset locally, and then update the root path.
 
 
 A longer description of your project goes here...
+## Dataset Selection
+The dataset used in this project is the GalaxyMNIST dataset, consisting of galaxy images and their corresponding labels. The labels represent different types of galaxies. The dataset is stored in an HDF5 file format and contains both image data (in the form of pixel values) and label data.
+
+## Types of Plots Chosen
+- **Histogram of Label Distribution**: This histogram shows the distribution of the galaxy labels across the dataset, allowing us to see how many instances exist for each galaxy type.
+- **Grid of Sample Images**: Randomly chosen images from the dataset, each paired with its corresponding label. This provides a visual representation of the dataset.
+
+## Instructions for Running the Code
+1. **Dependencies**: Install the required libraries using:
+    ```bash
+    pip install matplotlib numpy dash pillow h5py
+    ```
+2. **Static Plots**: Run the functions `plot_label_histogram` and `plot_image_grid` to display the histograms and image grid.
+3. **Interactive Plot**: To run the Dash app, use the command:
+    ```bash
+    python app.py
+    ```
+    The app will allow you to select labels and view the corresponding images interactively.
+
+## Interactive Visualization Guide
+- Use the dropdown to select one or more labels.
+- The images corresponding to the selected labels will be displayed below the dropdown.
 
 
 .. _pyscaffold-notes:
