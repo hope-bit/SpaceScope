@@ -35,6 +35,8 @@ SpaceScope
 
 
 Download the hdf5 dataset locally, and then update the root path.
+Run the file GalaxyViewer.py
+Open the dashboard if it does not automatically open.
 
 
 A longer description of your project goes here...
