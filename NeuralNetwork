@@ -77,10 +77,18 @@ plt.show()
 
 
 # Save the model
-model.save('galaxy_mnist_classifier.h5')
+model.save('galaxy_mnist_classifierH5.h5')
+model.save('galaxy_mnist_classifierK.keras')
 
 # Load and predict
-loaded_model = tf.keras.models.load_model('galaxy_mnist_classifier.h5')
+loaded_model = tf.keras.models.load_model('galaxy_mnist_classifierK.keras')
 predictions = loaded_model.predict(X_test)
 predicted_classes = np.argmax(predictions, axis=1)
+
+# Compile the model
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Train or evaluate the model
+model.fit(X_train, y_train, epochs=10)
+
 
