@@ -15,55 +15,66 @@ with h5py.File(test_file_path, 'r') as test_file:
     X_test = test_file['images'][:] / 255.0  # Normalize to [0, 1]
     y_test = test_file['labels'][:]
 
-# Reshape data to remove the extra dimension
-X_train = X_train.reshape(X_train.shape[0], 64, 64, 3)  # Reshape to (8000, 64, 64, 3)
-X_test = X_test.reshape(X_test.shape[0], 64, 64, 3)    # Reshape to (2000, 64, 64, 3)
-
-print(f"Training data shape: {X_train.shape}, Labels shape: {y_train.shape}")
-print(f"Test data shape: {X_test.shape}, Labels shape: {y_test.shape}")
+y_train = np.squeeze(y_train)
+y_test = np.squeeze(y_test)
 
 
 import tensorflow as tf
 import keras
-# Define the CNN model
-
 from keras import Sequential, layers, models
+from keras._tf_keras.keras.utils import to_categorical
+
+# Convert labels to one-hot encoding
+#from sklearn.preprocessing import OneHotEncoder
+print("y_train shape:", y_train.shape)
+print("y_train values:", y_train[:10])  # Print first 10 values to inspect
+print("y_test shape:", y_test.shape)
+print("y_test values:", y_test[:10])
+
+# One-hot encode labels
+y_train_one_hot = to_categorical(y_train, num_classes=4)
+y_test_one_hot = to_categorical(y_test, num_classes=4)
+
+print("y_train_one_hot shape:", y_train_one_hot.shape)
+print("y_test_one_hot shape:", y_test_one_hot.shape)
+y_train_one_hot = y_train_one_hot.astype('float32')
+y_test_one_hot = y_test_one_hot.astype('float32')
 
 # Define the model
 model = models.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
-    layers.MaxPooling2D((2, 2)),
+    layers.MaxPooling2D(),
     
     layers.Conv2D(64, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
+    layers.MaxPooling2D(),
     
     layers.Conv2D(128, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
+    layers.MaxPooling2D(),
     
     layers.Flatten(),
     
     layers.Dense(128, activation='relu'),
-    layers.Dropout(0.5),  # Add dropout to prevent overfitting
+    layers.Dropout(0.7),  # Add dropout to prevent overfitting
     
     layers.Dense(4, activation='softmax')  # Output layer with 4 classes
 ])
 
 # Compile the model
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Print model summary
 model.summary()
+print(model.output_shape)
 
-# Train the model
-history = model.fit(X_train, y_train, 
+# Train the model using the correct validation data
+history = model.fit(X_train, y_train_one_hot, 
                     epochs=16, 
                     batch_size=32, 
-                    validation_split=0.2) # Use 20% of training data for validation
+                    validation_data=(X_test, y_test_one_hot))  # Pass test data as validation data
 
 # Evaluate on test dataset
-test_loss, test_accuracy = model.evaluate(X_test, y_test)
+test_loss, test_accuracy = model.evaluate(X_test, y_test_one_hot)
 print(f"Test Accuracy: {test_accuracy:.2f}")
 
 import matplotlib.pyplot as plt
@@ -86,11 +97,3 @@ model.save('galaxy_mnist_classifierK.keras')
 loaded_model = tf.keras.models.load_model('galaxy_mnist_classifierK.keras')
 predictions = loaded_model.predict(X_test)
 predicted_classes = np.argmax(predictions, axis=1)
-
-# Compile the model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-# Train or evaluate the model
-model.fit(X_train, y_train, epochs=10)
-
-
