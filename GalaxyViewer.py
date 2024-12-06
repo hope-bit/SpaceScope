@@ -108,3 +108,34 @@ panel = pn.Column("## Interactive Image Viewer", slider, label_selector, pn.bind
 
 # Display the panel
 panel.show()
+
+# Histogram of label distribution
+def plot_label_histogram(labels):
+    """
+    Plot a histogram of label distribution.
+    """
+    plt.figure(figsize=(8, 6))
+    plt.hist(labels, bins=np.arange(labels.min(), labels.max() + 1), color='skyblue', edgecolor='black')
+    plt.title('Label Distribution')
+    plt.xlabel('Label')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    plt.show()
+
+# Display sample images with labels
+def plot_image_grid(images, labels, num_samples=10):
+    """
+    Display a grid of sample images with labels.
+    """
+    plt.figure(figsize=(12, 8))
+    for i in range(num_samples):
+        plt.subplot(2, 5, i + 1)
+        plt.imshow(images[i], cmap='gray')
+        plt.title(f"Label: {labels[i]}")
+        plt.axis("off")
+    plt.tight_layout()
+    plt.show()
+
+# Call the functions to display the plots
+plot_label_histogram(labels)
+plot_image_grid(images, labels)
