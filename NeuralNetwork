@@ -24,11 +24,10 @@ print(f"Test data shape: {X_test.shape}, Labels shape: {y_test.shape}")
 
 
 import tensorflow as tf
-from tensorflow.keras import layers, models
-
+import keras
 # Define the CNN model
 
-from tensorflow.keras import Sequential, layers
+from keras import Sequential, layers
 
 # Define the model
 model = Sequential([
@@ -52,7 +51,7 @@ model.summary()
 
 # Train the model
 history = model.fit(X_train, y_train, 
-                    epochs=10, 
+                    epochs=16, 
                     batch_size=32, 
                     validation_split=0.2) # Use 20% of training data for validation
 
