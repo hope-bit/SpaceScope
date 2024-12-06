@@ -64,8 +64,9 @@ model = models.Sequential([
 ])
 
 # Compile the model
+from keras._tf_keras.keras.optimizers import RMSprop
 
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=RMSprop(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Print model summary
 model.summary()
