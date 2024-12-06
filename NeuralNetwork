@@ -51,9 +51,12 @@ model = models.Sequential([
     layers.Conv2D(128, (3, 3), activation='relu'),
     layers.MaxPooling2D(),
     
+    layers.Conv2D(256, (3, 3), activation='relu'),
+    layers.MaxPooling2D(),
+
     layers.Flatten(),
     
-    layers.Dense(128, activation='relu'),
+    layers.Dense(512, activation='relu'),
     layers.Dropout(0.7),  # Add dropout to prevent overfitting
     
     layers.Dense(4, activation='softmax')  # Output layer with 4 classes
