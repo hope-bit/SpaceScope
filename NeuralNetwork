@@ -1,35 +1,45 @@
 import h5py
 import numpy as np
-from sklearn.model_selection import train_test_split
 
-# Load dataset
-file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/train_dataset.hdf5'
-with h5py.File(file_path, 'r') as hdf5_file:
-    images = hdf5_file['images'][:] / 255.0  # Normalize pixel values to [0, 1]
-    labels = hdf5_file['labels'][:]
+# Paths to datasets
+train_file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/train_dataset.hdf5'
+test_file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/test_dataset.hdf5'
 
-# Split data
-X_train, X_temp, y_train, y_temp = train_test_split(images, labels, test_size=0.3, random_state=42)
-X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
+# Load training dataset
+with h5py.File(train_file_path, 'r') as train_file:
+    X_train = train_file['images'][:] / 255.0  # Normalize to [0, 1]
+    y_train = train_file['labels'][:]
 
-# Reshape for compatibility with neural networks
-X_train = X_train[..., np.newaxis]
-X_val = X_val[..., np.newaxis]
-X_test = X_test[..., np.newaxis]
+# Load test dataset
+with h5py.File(test_file_path, 'r') as test_file:
+    X_test = test_file['images'][:] / 255.0  # Normalize to [0, 1]
+    y_test = test_file['labels'][:]
+
+# Reshape data to remove the extra dimension
+X_train = X_train.reshape(X_train.shape[0], 64, 64, 3)  # Reshape to (8000, 64, 64, 3)
+X_test = X_test.reshape(X_test.shape[0], 64, 64, 3)    # Reshape to (2000, 64, 64, 3)
+
+print(f"Training data shape: {X_train.shape}, Labels shape: {y_train.shape}")
+print(f"Test data shape: {X_test.shape}, Labels shape: {y_test.shape}")
+
 
 import tensorflow as tf
 from tensorflow.keras import layers, models
 
 # Define the CNN model
-model = models.Sequential([
-    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], 1)),
+
+from tensorflow.keras import Sequential, layers
+
+# Define the model
+model = Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),  # Updated input shape
     layers.MaxPooling2D((2, 2)),
     layers.Conv2D(64, (3, 3), activation='relu'),
     layers.MaxPooling2D((2, 2)),
     layers.Conv2D(64, (3, 3), activation='relu'),
     layers.Flatten(),
     layers.Dense(128, activation='relu'),
-    layers.Dense(len(np.unique(labels)), activation='softmax')  # One output for each class
+    layers.Dense(len(np.unique(y_train)), activation='softmax')  # One output for each class
 ])
 
 # Compile the model
@@ -37,17 +47,21 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
+# Print model summary
 model.summary()
 
 # Train the model
 history = model.fit(X_train, y_train, 
                     epochs=10, 
                     batch_size=32, 
-                    validation_data=(X_val, y_val))
+                    validation_split=0.2) # Use 20% of training data for validation
 
-# Evaluate on test data
+
+
+# Evaluate on test dataset
 test_loss, test_accuracy = model.evaluate(X_test, y_test)
 print(f"Test Accuracy: {test_accuracy:.2f}")
+
 
 
 import matplotlib.pyplot as plt
