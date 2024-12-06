@@ -27,18 +27,25 @@ import tensorflow as tf
 import keras
 # Define the CNN model
 
-from keras import Sequential, layers
+from keras import Sequential, layers, models
 
 # Define the model
-model = Sequential([
-    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),  # Updated input shape
+model = models.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
     layers.MaxPooling2D((2, 2)),
+    
     layers.Conv2D(64, (3, 3), activation='relu'),
     layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(64, (3, 3), activation='relu'),
+    
+    layers.Conv2D(128, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    
     layers.Flatten(),
+    
     layers.Dense(128, activation='relu'),
-    layers.Dense(len(np.unique(y_train)), activation='softmax')  # One output for each class
+    layers.Dropout(0.5),  # Add dropout to prevent overfitting
+    
+    layers.Dense(4, activation='softmax')  # Output layer with 4 classes
 ])
 
 # Compile the model
@@ -55,13 +62,9 @@ history = model.fit(X_train, y_train,
                     batch_size=32, 
                     validation_split=0.2) # Use 20% of training data for validation
 
-
-
 # Evaluate on test dataset
 test_loss, test_accuracy = model.evaluate(X_test, y_test)
 print(f"Test Accuracy: {test_accuracy:.2f}")
-
-
 
 import matplotlib.pyplot as plt
 
@@ -74,7 +77,6 @@ plt.ylabel('Accuracy')
 plt.legend()
 plt.title('Training and Validation Accuracy')
 plt.show()
-
 
 # Save the model
 model.save('galaxy_mnist_classifierH5.h5')
