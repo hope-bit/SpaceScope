@@ -40,6 +40,7 @@ print("y_test_one_hot shape:", y_test_one_hot.shape)
 y_train_one_hot = y_train_one_hot.astype('float32')
 y_test_one_hot = y_test_one_hot.astype('float32')
 
+
 # Define the model
 model = models.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
@@ -70,10 +71,35 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 model.summary()
 print(model.output_shape)
 
-# Train the model using the correct validation data
-history = model.fit(X_train, y_train_one_hot, 
-                    epochs=20,  
-                    validation_data=(X_test, y_test_one_hot))  # Pass test data as validation data
+from keras._tf_keras.keras.preprocessing.image import ImageDataGenerator
+#Create an ImageDataGenerator instance for data augmentation
+datagen = ImageDataGenerator(
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest'
+)
+
+# Fit the generator to your training data
+datagen.fit(X_train)
+
+from keras._tf_keras.keras.callbacks import LearningRateScheduler, ReduceLROnPlateau, EarlyStopping
+# Reduce learning rate on plateau
+lr_scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=0.00001)
+
+# Early stopping
+early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+
+# Train the model with augmented data and callbacks
+history = model.fit(
+    datagen.flow(X_train, y_train_one_hot, batch_size=32),
+    epochs=20,
+    validation_data=(X_test, y_test_one_hot),
+    callbacks=[lr_scheduler, early_stopping]  # Ensure callbacks are passed correctly
+)
 
 # Evaluate on test dataset
 test_loss, test_accuracy = model.evaluate(X_test, y_test_one_hot)
