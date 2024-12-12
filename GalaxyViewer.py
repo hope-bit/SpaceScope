@@ -13,7 +13,7 @@ with h5py.File(file_path, 'r') as hdf5_file:
     images = hdf5_file['images'][:]
     labels = hdf5_file['labels'][:]
     
-classArray = ["smooth_round", "smooth_cigar", "edge_on_disk", "barred_spiral"]  # Class names for labels
+classArray = ["round", "smooth_bar", "edge_on_disk", "spiral"]  # Class names for labels
 # Replace the numeric labels with the corresponding class names
 label_names = np.array([classArray[label] for label in labels])
 

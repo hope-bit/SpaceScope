@@ -10,7 +10,7 @@ app = Flask(__name__)
 model = load_model(r'C:\Users\HopeW\Downloads\SpaceScope\galaxy_mnist_classifierH5.h5')
 
 # Define the class names
-classArray = ["smooth_round", "smooth_cigar", "edge_on_disk", "barred_spiral"]  # Class names for labels
+classArray = ["round", "smooth_bar", "edge_on_disk", "spiral"]  # Class names for labels
 
 # Directory to save uploaded images
 UPLOAD_FOLDER = 'uploads'
