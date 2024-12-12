@@ -1,7 +1,94 @@
 import h5py
 import numpy as np
+import os
+from datafed.CommandLib import API
+'''
+# Initialize the DataFed API
+df_api = API()
 
-# Paths to datasets
+# Dataset IDs in DataFed
+train_dataset_id = "d/525641772"
+test_dataset_id = "d/525641748"
+
+def download_dataset(dataset_id, output_dir="data"):
+    import time
+    
+    # Ensure the output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+    print(f"Attempting to download dataset {dataset_id} to {output_dir}")
+    
+    # Trigger the download request using the DataFed API (df_api)
+    response = df_api.dataGet(dataset_id, output_dir)
+    print("DataGet result:", response)
+
+    # Extract the task ID from the response (task ID will be used to track download status)
+    task_id = None
+    for line in str(response).split("\n"):
+        if "task/" in line:
+            task_id = line.split('"')[1]  # Extract task ID from response
+            break
+
+    if not task_id:
+        raise RuntimeError("Failed to retrieve task ID from DataGet response.")
+    
+    print(f"Task initiated with ID: {task_id}")
+
+    # Wait for the task to complete (polling every 5 seconds)
+    while True:
+        try:
+            task_details = df_api.taskView(task_id)  # Fetch task details using the task ID
+        except Exception as e:
+            raise RuntimeError(f"Failed to fetch task status: {e}")
+        
+        print(f"Task details: {task_details}")
+        
+        # Handle the task details, assuming it's a tuple or dictionary-like object
+        if isinstance(task_details, tuple):
+            print("Task details is a tuple. Inspecting first element:", task_details[0])
+            task_status = task_details[0]  # Get the first element if it's a tuple
+        else:
+            print("Task details structure:", task_details)
+            task_status = task_details  # If it's not a tuple, use the entire response
+        
+        print(f"Current task status: {task_status}")
+        
+        # Extract the task status (assuming it's a dictionary or direct status string)
+        if isinstance(task_status, dict):
+            status = task_status.get('status', None)
+        else:
+            status = task_status  # Direct assignment if task status is not a dictionary
+        
+        # Check the task status and act accordingly
+        if status == "TS_COMPLETE":
+            print("Task completed successfully.")
+            break
+        elif status in ["TS_ERROR", "TS_ABORTED"]:
+            raise RuntimeError(f"DataGet task failed with status: {status}")
+        else:
+            print("Task still in progress. Waiting...")
+            time.sleep(30)  # Wait for 5 seconds before checking the status again
+
+    # Check the output directory for the downloaded dataset
+    files = os.listdir(output_dir)
+    print("Files in output_dir:", files)
+    
+    # Find the downloaded dataset based on the dataset_id
+    for file_name in files:
+        if dataset_id.split('/')[1] in file_name:  # Match the dataset ID in the filename
+            dataset_path = os.path.join(output_dir, file_name)
+            print(f"Dataset {dataset_id} found at {dataset_path}")
+            return dataset_path
+
+    # If dataset is not found, raise an error
+    raise FileNotFoundError(f"Dataset {dataset_id} could not be found in {output_dir}")
+
+
+# Paths to downloaded datasets
+train_file_path = download_dataset(train_dataset_id)
+test_file_path = download_dataset(test_dataset_id)
+
+'''
+# Paths to local datasets
 train_file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/train_dataset.hdf5'
 test_file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/test_dataset.hdf5'
 
