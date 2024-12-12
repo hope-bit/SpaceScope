@@ -3,11 +3,15 @@ import h5py
 import numpy as np
 from keras._tf_keras.keras.models import load_model
 from PIL import Image
+from galaxy_mnist import GalaxyMNIST
 
 app = Flask(__name__)
 
 # Load your trained model
 model = load_model(r'C:\Users\HopeW\Downloads\SpaceScope\galaxy_mnist_classifierH5.h5')
+
+# Define the class names
+classArray = GalaxyMNIST.classes  # Class names for labels
 
 def preprocess_image(image):
     image = image.resize((64, 64))  # Resize to the input size of your model
@@ -31,7 +35,9 @@ def predict():
         image = preprocess_image(image)
         prediction = model.predict(image)
         class_id = np.argmax(prediction)
-        return f'Predicted class: {class_id}'
+        class_name = classArray[class_id]  # Get the class name
+        
+        return f'Predicted class: {class_name}'
 
 if __name__ == '__main__':
     app.run(debug=True)
