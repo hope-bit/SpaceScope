@@ -20,7 +20,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def preprocess_image(image):
-    image = image.resize((64, 64))  # Resize to the input size of your model
+    image = image.resize((224, 224))  # Resize to the input size of your model
     image = np.array(image) / 255.0  # Normalize to [0, 1]
     image = np.expand_dims(image, axis=0)  # Add batch dimension
     return image
