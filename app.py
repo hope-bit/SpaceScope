@@ -1,9 +1,8 @@
-from flask import Flask, request, render_template
-import h5py
+from flask import Flask, request, render_template, send_from_directory
+import os
 import numpy as np
 from keras._tf_keras.keras.models import load_model
 from PIL import Image
-from galaxy_mnist import GalaxyMNIST
 
 app = Flask(__name__)
 
@@ -11,7 +10,14 @@ app = Flask(__name__)
 model = load_model(r'C:\Users\HopeW\Downloads\SpaceScope\galaxy_mnist_classifierH5.h5')
 
 # Define the class names
-classArray = GalaxyMNIST.classes  # Class names for labels
+classArray = ["smooth_round", "smooth_cigar", "edge_on_disk", "barred_spiral"]  # Class names for labels
+
+# Directory to save uploaded images
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def preprocess_image(image):
     image = image.resize((64, 64))  # Resize to the input size of your model
@@ -31,13 +37,29 @@ def predict():
     if file.filename == '':
         return 'No selected file'
     if file:
-        image = Image.open(file)
-        image = preprocess_image(image)
-        prediction = model.predict(image)
+        # Save the uploaded file
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(file_path)
+
+        # Open and preprocess the image
+        image = Image.open(file_path)
+        image_preprocessed = preprocess_image(image)
+        
+        # Predict the class
+        prediction = model.predict(image_preprocessed)
         class_id = np.argmax(prediction)
         class_name = classArray[class_id]  # Get the class name
         
-        return f'Predicted class: {class_name}'
+        # Debugging information
+        print(f"Prediction: {prediction}")
+        print(f"Class ID: {class_id}")
+        print(f"Class Name: {class_name}")
+        
+        return render_template('result.html', class_name=class_name, image_path=file.filename)
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

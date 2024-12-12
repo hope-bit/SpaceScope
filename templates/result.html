@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Galaxy Classifier Result</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Classification Result</h1>
+      <p>Predicted class: {{ class_name }}</p>
+      <img src="{{ url_for('uploaded_file', filename=image_path) }}" alt="Uploaded Image">
+      <br>
+      <a href="/">Upload another image</a>
+    </div>
+  </body>
+</html>
