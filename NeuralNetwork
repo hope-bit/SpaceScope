@@ -89,8 +89,8 @@ test_file_path = download_dataset(test_dataset_id)
 
 '''
 # Paths to local datasets
-train_file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/train_dataset.hdf5'
-test_file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/test_dataset.hdf5'
+train_file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/train_dataset.hdf5'
+test_file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/test_dataset.hdf5'
 
 # Load training dataset
 with h5py.File(train_file_path, 'r') as train_file:
@@ -130,7 +130,7 @@ y_test_one_hot = y_test_one_hot.astype('float32')
 
 # Define the model
 model = models.Sequential([
-    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(224, 224, 3)),
     layers.MaxPooling2D(),
     layers.BatchNormalization(),
     layers.Conv2D(64, (3, 3), activation='relu'),

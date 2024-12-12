@@ -5,15 +5,15 @@ from dash import Dash, dcc, html, Input, Output
 import base64
 from io import BytesIO
 from PIL import Image
-from galaxy_mnist import GalaxyMNIST
+from galaxy_mnist import GalaxyMNISTHighrez
 
 # Load dataset from local
-file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/raw/train_dataset.hdf5'  # Update this path
+file_path = 'C:/Users/HopeW/Downloads/MEM679_Project/SpaceScope/galaxy_mnist/GalaxyMNIST/train_dataset.hdf5'  # Update this path
 with h5py.File(file_path, 'r') as hdf5_file:
     images = hdf5_file['images'][:]
     labels = hdf5_file['labels'][:]
     
-classArray = GalaxyMNIST.classes  # Class names for labels
+classArray = ["smooth_round", "smooth_cigar", "edge_on_disk", "barred_spiral"]  # Class names for labels
 # Replace the numeric labels with the corresponding class names
 label_names = np.array([classArray[label] for label in labels])
 
